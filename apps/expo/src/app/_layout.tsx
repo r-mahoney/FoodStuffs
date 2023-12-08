@@ -1,29 +1,65 @@
-import React from "react";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { Slot, useRouter, useSegments } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 
 import { TRPCProvider } from "~/utils/api";
 
-import "../styles.css";
+const CLERK_PUBLISHABLE_KEY =
+  "pk_test_a25vd24tc3dpbmUtNzMuY2xlcmsuYWNjb3VudHMuZGV2JA";
+// const CLERK_PUBLISHABLE_KEY =
+//   "pk_test_dG91Y2hpbmctYmVkYnVnLTQ0LmNsZXJrLmFjY291bnRzLmRldiQ";
 
-// This is the main layout of the app
-// It wraps your pages with the providers they need
+const InitialLayout = () => {
+  const { isLoaded, isSignedIn } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const inTabsGroup = segments[0] === "(auth)";
+
+    console.log("User changed: ", isSignedIn);
+    console.log(segments)
+
+    if (isSignedIn && !inTabsGroup) {
+      router.replace("/(auth)/(home)");
+    } else if (!isSignedIn) {
+      router.replace("/login");
+    }
+  }, [isSignedIn]);
+
+  return <Slot />;
+};
+
+const tokenCache = {
+  async getToken(key: string) {
+    try {
+      return SecureStore.getItemAsync(key);
+    } catch (err) {
+      return null;
+    }
+  },
+  async saveToken(key: string, value: string) {
+    try {
+      return SecureStore.setItemAsync(key, value);
+    } catch (err) {
+      return;
+    }
+  },
+};
+
 const RootLayout = () => {
   return (
-    <TRPCProvider>
-      {/*
-        The Stack component displays the current page.
-        It also allows you to configure your screens 
-      */}
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: "#f472b6",
-          },
-        }}
-      />
-      <StatusBar />
-    </TRPCProvider>
+    <ClerkProvider
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+      tokenCache={tokenCache}
+    >
+      <TRPCProvider>
+        <InitialLayout />
+      </TRPCProvider>
+    </ClerkProvider>
   );
 };
 
