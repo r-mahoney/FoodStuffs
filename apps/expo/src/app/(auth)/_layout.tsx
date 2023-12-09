@@ -1,15 +1,13 @@
 import { Pressable } from "react-native";
-import { Tabs } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
-
-import HamburgerIcon from "~/components/HamburgerIcon";
 
 export const LogoutButton = () => {
   const { signOut } = useAuth();
 
-  const doLogout = () => {
-    signOut();
+  const doLogout = async() => {
+    await signOut();
   };
 
   return (
@@ -47,7 +45,7 @@ const TabsPage = () => {
         options={{
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
+            <Ionicons name="home-outline" size={size} color={color} onPress={()=> router.push("/(auth)/(home)/home")}/>
           ),
           tabBarLabel: "Home",
         }}

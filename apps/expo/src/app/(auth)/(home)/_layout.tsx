@@ -1,15 +1,15 @@
-import React from "react";
-import { Text, View } from "react-native";
+import type { DrawerNavigationProp } from "@react-navigation/drawer";
+import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import { DrawerActions } from "@react-navigation/native";
+import type { ParamListBase } from "@react-navigation/native";
 import { router, useNavigation } from "expo-router";
 import { Drawer } from "expo-router/drawer";
-import { useUser } from "@clerk/clerk-expo";
-import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
-import type { DrawerNavigationProp } from "@react-navigation/drawer";
-import { DrawerActions, ParamListBase } from "@react-navigation/native";
+import React from "react";
 
 import HamburgerIcon from "~/components/HamburgerIcon";
 
-const CustomDrawerComponent = (props: any) => {
+//@ts-expect-error dont know what props were passing yet
+const CustomDrawerComponent = (props) => {
   const navigation = useNavigation<DrawerNavigationProp<ParamListBase>>();
 
   return (
@@ -18,21 +18,21 @@ const CustomDrawerComponent = (props: any) => {
         label={"Home"}
         onPress={() => {
           navigation.dispatch(DrawerActions.closeDrawer());
-          router.push("/(auth)/(home)");
+          router.push("/(auth)/(home)/home");
         }}
       ></DrawerItem>
       <DrawerItem
         label={"Add to Pantry"}
         onPress={() => {
           navigation.dispatch(DrawerActions.closeDrawer());
-          router.push("/(auth)/(home)");
+          router.push("/(auth)/(home)/pantry");
         }}
       ></DrawerItem>
       <DrawerItem
         label={"Shopping List"}
         onPress={() => {
           navigation.dispatch(DrawerActions.closeDrawer());
-          router.push("/(auth)/(home)");
+          router.push("/(auth)/(home)/shopping-list");
         }}
       ></DrawerItem>
     </DrawerContentScrollView>
@@ -51,7 +51,7 @@ export default function Layout() {
           headerLeft: () => <HamburgerIcon />,
           title: "Home",
         }}
-        drawerContent={(props) => <CustomDrawerComponent />}
+        drawerContent={(props) => <CustomDrawerComponent props={props}/>}
       />
     </>
   );

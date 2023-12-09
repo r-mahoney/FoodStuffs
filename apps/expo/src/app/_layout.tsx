@@ -21,13 +21,13 @@ const InitialLayout = () => {
     const inTabsGroup = segments[0] === "(auth)";
 
     console.log("User changed: ", isSignedIn);
-    console.log(segments)
 
     if (isSignedIn && !inTabsGroup) {
-      router.replace("/(auth)/(home)");
+      router.replace("/(auth)/(home)/home");
     } else if (!isSignedIn) {
       router.replace("/login");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSignedIn]);
 
   return <Slot />;
