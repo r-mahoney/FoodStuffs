@@ -1,10 +1,10 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-export default function ShoppingList() {
+export default function Pantry() {
   return (
     <View>
-      <Text>ShoppingList</Text>
+      <Text>Pantry</Text>
     </View>
   )
 }
