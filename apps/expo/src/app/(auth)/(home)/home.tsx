@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { Button, ScrollView, Text, View, StyleSheet } from "react-native";
 import * as SQLite from "expo-sqlite";
 import { useUser } from "@clerk/clerk-expo";
 
@@ -11,7 +11,7 @@ interface Item {
 }
 
 const Home = () => {
-  const db = SQLite.openDatabase('pantry_items.db');
+  const db = SQLite.openDatabase("pantry_items.db");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
@@ -19,42 +19,58 @@ const Home = () => {
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS pantry_items (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, number TEXT, units TEXT)',
+        "CREATE TABLE IF NOT EXISTS pantry_items (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, number TEXT, units TEXT)",
       );
     });
     db.transaction((tx) => {
-      tx.executeSql('SELECT * FROM pantry_items', undefined, 
-      (txtObj, resultsSet) => setItems(resultsSet.rows._array),
-      (txObj, error) => console.log(error)
+      tx.executeSql(
+        "SELECT * FROM pantry_items",
+        undefined,
+        (txtObj, resultsSet) => setItems(resultsSet.rows._array),
+        (txObj, error) => console.log(error),
       );
     });
 
-    setLoading(false)
+    setLoading(false);
   }, []);
 
-  console.log(items)
+  console.log(items);
 
-  if(loading) {
+  if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ textAlign: "center" }}>
-        Loading...
-      </Text>
-    </View>
-    )
+        <Text style={{ textAlign: "center" }}>Loading...</Text>
+      </View>
+    );
   }
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ textAlign: "center" }}>
-        {user!.firstName
-          ? `Welcome ${user!.firstName}  🎉!`
-          : `Good morning ${user!.username}!  🎉`}
-      </Text>
-      {/* {items.map(item => (
-        <Text>{item.item_name}</Text>
-      ))} */}
-    </View>
+    <ScrollView>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ textAlign: "center" }}>
+          {user!.firstName
+            ? `Welcome ${user!.firstName}  🎉!`
+            : `Good morning ${user!.username}!  🎉`}
+        </Text>
+        {items.map((item) => (
+          <View style>
+            <Text>{item.item_name}</Text>
+            <Button onPress={() => {}} title="Delete"></Button>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 
 export default Home;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+  button: {
+    alignItems: "flex-end"
+  }
+})

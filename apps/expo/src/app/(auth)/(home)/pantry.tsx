@@ -25,7 +25,7 @@ export default function ShoppingList() {
   const db = SQLite.openDatabase("pantry_items.db");
 
   const validateInput = (input: string, element: string) => {
-    if (!input) {
+    if (input.length < 1) {
       let current = [...errors];
       current.push(`${element} must contain a valid input.`);
       setErrors(current);
@@ -76,9 +76,9 @@ export default function ShoppingList() {
     validateInput(numberOfItems, "Number of Items");
     validateInput(itemToAdd, "Item Name");
     validateInput(units, "Units");
+    
     if (errors.length > 0) {
       errors.forEach((error) => alert(error));
-      return
     } else {
       const pantryItem: Item = {
         number: numberOfItems,
@@ -91,6 +91,7 @@ export default function ShoppingList() {
       setItemToAdd("");
     }
   };
+
   return (
     <View style={styles.container}>
       {/* <Spinner visible={loading} /> */}
