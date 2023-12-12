@@ -18,20 +18,29 @@ interface Item {
 
 export default function ShoppingList() {
   const [itemToAdd, setItemToAdd] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
   const [units, setUnits] = useState("");
   const [numberOfItems, setNumberOfItems] = useState("");
   const [pantryItems, setPantryItems] = useState<Item[]>([]);
   const db = SQLite.openDatabase("pantry_items.db");
 
+  const validateInput = (input: string, element: string) => {
+    if (!input) {
+      let current = [...errors];
+      current.push(`${element} must contain a valid input.`);
+      setErrors(current);
+    }
+  };
+
   useEffect(() => {
     db.transaction((tx) => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS pantry_items (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, number TEXT, units TEXT)',
+        "CREATE TABLE IF NOT EXISTS pantry_items (id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, number TEXT, units TEXT)",
       );
     });
     db.transaction((tx) => {
       tx.executeSql(
-        'SELECT * FROM pantry_items',
+        "SELECT * FROM pantry_items",
         undefined,
         (txtObj, resultsSet) => setPantryItems(resultsSet.rows._array),
         (txtObj, error) => {
@@ -46,10 +55,9 @@ export default function ShoppingList() {
   const addItemToPantry = (pantryItem: Item) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'INSERT INTO pantry_items (item_name, number, units) VALUES (?, ?, ?)',
+        "INSERT INTO pantry_items (item_name, number, units) VALUES (?, ?, ?)",
         [pantryItem.item_name, pantryItem.number, pantryItem.units],
         (txtObj, resultsSet) => {
-          console.log(pantryItems)
           let existingItems = [...pantryItems];
           existingItems.push({
             id: resultsSet.insertId,
@@ -59,23 +67,29 @@ export default function ShoppingList() {
           });
           setPantryItems(existingItems);
         },
-        (txtObj, error) => console.log(error)
+        (txtObj, error) => console.log(error),
       );
     });
   };
 
-  console.log(pantryItems)
-
   const submit = () => {
-    const pantryItem: Item = {
-      number: numberOfItems,
-      item_name: itemToAdd,
-      units: units,
-    };
-    addItemToPantry(pantryItem);
-    setNumberOfItems("");
-    setUnits("");
-    setItemToAdd("");
+    validateInput(numberOfItems, "Number of Items");
+    validateInput(itemToAdd, "Item Name");
+    validateInput(units, "Units");
+    if (errors.length > 0) {
+      errors.forEach((error) => alert(error));
+      return
+    } else {
+      const pantryItem: Item = {
+        number: numberOfItems,
+        item_name: itemToAdd,
+        units: units,
+      };
+      addItemToPantry(pantryItem);
+      setNumberOfItems("");
+      setUnits("");
+      setItemToAdd("");
+    }
   };
   return (
     <View style={styles.container}>
